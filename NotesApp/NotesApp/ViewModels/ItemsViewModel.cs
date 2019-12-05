@@ -7,29 +7,38 @@ using Xamarin.Forms;
 
 using NotesApp.Models;
 using NotesApp.Views;
+using System.Linq;
 
 namespace NotesApp.ViewModels
 {
     public class ItemsViewModel : BaseViewModel
     {
-        public ObservableCollection<Item> Items { get; set; }
-        public Command LoadItemsCommand { get; set; }
+        public ObservableCollection<Note> Notes { get; set; }
+        public Command LoadNotesCommand { get; set; }
 
         public ItemsViewModel()
         {
             Title = "Browse";
-            Items = new ObservableCollection<Item>();
-            LoadItemsCommand = new Command(async () => await ExecuteLoadItemsCommand());
+            Notes = new ObservableCollection<Note>();
+            LoadNotesCommand = new Command(async () => await ExecuteLoadNotesCommand());
 
-            MessagingCenter.Subscribe<NewItemPage, Item>(this, "AddItem", async (obj, item) =>
+            MessagingCenter.Subscribe<ItemDetailPage, Note>(this, "SaveNote", async (obj, note) =>
             {
-                var newItem = item as Item;
-                Items.Add(newItem);
-                await DataStore.AddItemAsync(newItem);
+                Notes.Add(note);
+                await DataStore.AddNoteAsync(note);
+            });
+
+            MessagingCenter.Subscribe<ItemDetailPage, Note>(this, "UpdateNote", async (obj, note) =>
+            {
+                //Notes.Remove(Notes.Where(x => x.Id == note.Id).FirstOrDefault());
+                //Notes.Add(note);
+
+                await DataStore.UpdateNoteAsync(note);
+                await ExecuteLoadNotesCommand();
             });
         }
 
-        async Task ExecuteLoadItemsCommand()
+        async Task ExecuteLoadNotesCommand()
         {
             if (IsBusy)
                 return;
@@ -38,11 +47,11 @@ namespace NotesApp.ViewModels
 
             try
             {
-                Items.Clear();
-                var items = await DataStore.GetItemsAsync(true);
-                foreach (var item in items)
+                Notes.Clear();
+                var notes = await DataStore.GetNotesAsync();
+                foreach (var note in notes)
                 {
-                    Items.Add(item);
+                    Notes.Add(note);
                 }
             }
             catch (Exception ex)

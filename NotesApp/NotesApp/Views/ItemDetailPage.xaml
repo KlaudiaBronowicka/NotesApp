@@ -7,11 +7,16 @@
              x:Class="NotesApp.Views.ItemDetailPage"
              Title="{Binding Title}">
 
+    <ContentPage.ToolbarItems>
+        <ToolbarItem Text="Cancel" Clicked="Cancel_Clicked" />
+        <ToolbarItem Text="Save" Clicked="Save_Clicked" />
+    </ContentPage.ToolbarItems>
+
     <StackLayout Spacing="20" Padding="15">
-        <Label Text="Text:" FontSize="Medium" />
-        <Label Text="{Binding Item.Text}" d:Text="Item name" FontSize="Small"/>
-        <Label Text="Description:" FontSize="Medium" />
-        <Label Text="{Binding Item.Description}" d:Text="Item description" FontSize="Small"/>
+        <Picker x:Name="NoteCourse" FontSize="Medium" Title="Course name" ItemsSource="{Binding CourseList}" SelectedItem="{Binding NoteCourse}">
+        </Picker>
+        <Entry x:Name="NoteTitle" Text="{Binding NoteTitle}" FontSize="Medium" Placeholder="Note title" />
+        <Editor x:Name="NoteText" Text="{Binding NoteText}" FontSize="Medium" Placeholder="Note text" AutoSize="TextChanges" />
     </StackLayout>
     
 </ContentPage>

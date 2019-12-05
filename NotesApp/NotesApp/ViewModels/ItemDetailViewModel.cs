@@ -1,16 +1,67 @@
 ﻿using System;
-
+using System.Collections.Generic;
 using NotesApp.Models;
 
 namespace NotesApp.ViewModels
 {
     public class ItemDetailViewModel : BaseViewModel
     {
-        public Item Item { get; set; }
-        public ItemDetailViewModel(Item item = null)
+        public Note Note { get; set; }
+
+        public bool IsNewNote;
+
+        public string NoteTitle
         {
-            Title = item?.Text;
-            Item = item;
+            get => Note.Title;
+            set
+            {
+                Note.Title = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string NoteText
+        {
+            get => Note.Text;
+            set
+            {
+                Note.Text = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public string NoteCourse
+        {
+            get => Note.Course;
+            set
+            {
+                Note.Course = value;
+                OnPropertyChanged();
+            }
+        }
+
+        public IList<string> CourseList { get; set; }
+
+        public ItemDetailViewModel(Note note = null)
+        {
+            if (note == null)
+            {
+                IsNewNote = true;
+                Title = "Create note";
+                Note = new Note();
+            }
+            else
+            {
+                Title = "Edit note";
+                Note = note;
+            }
+
+            InitializeCourseList();
+        }
+
+        private async void InitializeCourseList()
+        {
+            CourseList = await DataStore.GetCoursesAsync();
         }
     }
 }

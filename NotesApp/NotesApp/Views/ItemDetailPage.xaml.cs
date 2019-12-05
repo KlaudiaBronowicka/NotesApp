@@ -5,6 +5,8 @@ using Xamarin.Forms.Xaml;
 
 using NotesApp.Models;
 using NotesApp.ViewModels;
+using System.Collections.Generic;
+using NotesApp.Services;
 
 namespace NotesApp.Views
 {
@@ -13,27 +15,42 @@ namespace NotesApp.Views
     [DesignTimeVisible(false)]
     public partial class ItemDetailPage : ContentPage
     {
-        ItemDetailViewModel viewModel;
+        ItemDetailViewModel _viewModel;
 
         public ItemDetailPage(ItemDetailViewModel viewModel)
         {
             InitializeComponent();
 
-            BindingContext = this.viewModel = viewModel;
+            _viewModel = viewModel;
+            BindingContext = viewModel;
+
         }
 
         public ItemDetailPage()
         {
             InitializeComponent();
+            
+            _viewModel = new ItemDetailViewModel();
+            BindingContext = _viewModel;
+        }
+         
+        public void Cancel_Clicked(object sender, EventArgs eventArgs)
+        {
+            Navigation.PopModalAsync();
+        }
 
-            var item = new Item
+        public void Save_Clicked(object sender, EventArgs eventArgs)
+        {
+            if (_viewModel.IsNewNote)
             {
-                Text = "Item 1",
-                Description = "This is an item description."
-            };
+                MessagingCenter.Send(this, "SaveNote", _viewModel.Note);
+            }
+            else
+            {
+                MessagingCenter.Send(this, "UpdateNote", _viewModel.Note);
+            }
 
-            viewModel = new ItemDetailViewModel(item);
-            BindingContext = viewModel;
+            Navigation.PopModalAsync();
         }
     }
 }
